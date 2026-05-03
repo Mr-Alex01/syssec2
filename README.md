@@ -92,4 +92,4 @@ slave можно разместить ближе к пользователям, 
 
 `Блоксхема получилась следующая (её я делал через посторонний сервис):`
 
-![1](https://github.com/Mr-Alex01/sdbsql2/blob/main/img/1.jpg)
+![6](https://github.com/Mr-Alex01/sdbsql2/blob/main/img/6.jpg)
