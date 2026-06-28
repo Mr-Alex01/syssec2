@@ -24,36 +24,13 @@
 
 ### Задание 1
 
-1. `Какие сетевые службы в ней разрешены?`  
-Из открытых портов можно увидеть множество служб, таких как:
+`Так выглядел в домашней директории файл до шифровки:`
 
-ftp (vsftpd и ProFTPD)  
-ssh (OpenSSH)  
-telnet  
-vnc  
-http  
-domain  
-smtp (Postfix)  
-mysql  
-postgresql  
-и др.
+![1](https://github.com/Mr-Alex01/syssec2/blob/main/img/1.jpg)
 
-![1](https://github.com/Mr-Alex01/syssec1/blob/main/img/1.jpg)
+`И после неё, если попытаться открыть его:`
 
-2. `Какие уязвимости были вами обнаружены?`  
-`На сайте с уязвимостями удалось найти следующие три:`
-
-`1: бэкдор в vsftpd 2.3.4 (21 порт)`  
-vsftpd 2.3.4 - Backdoor Command Execution  
-https://www.exploit-db.com/exploits/49757
-
-`2: бэкдор в UnrealIRCd 3.2.8.1 (6667 порт)`  
-unrealIRCd 3.2.8.1 - Backdoor Command Execution  
-https://www.exploit-db.com/exploits/16922
-
-`3: выполнение кода в samba 3.0.20 (139/445 порты)`  
-samba 3.0.20 < 3.0.25rc3 - 'Username' map script Command Execution  
-https://www.exploit-db.com/exploits/16320
+![2](https://github.com/Mr-Alex01/syssec2/blob/main/img/2.jpg)
 
 
 
@@ -61,33 +38,45 @@ https://www.exploit-db.com/exploits/16320
 
 ### Задание 2
 
-`1. Чем отличаются эти режимы с точки зрения сетевого трафика?`
+`Для начала посмотрел версию cryptsetup:`
 
-Разница во флагах tcp-пакета и как эти режимы взаимодействуют с ОС атакуемой системы.
+![3](https://github.com/Mr-Alex01/syssec2/blob/main/img/3.jpg)
 
-`- SYN`  
-nmap отправляет пакет с флагом SYN для установления соединения. Но как только сервер отвечает, nmap тут же разрывает соединение, не завершая процедуру трёхэтапного рукопожатия.  
-`- FIN`  
-nmap отправляет пакет только с флагом FIN на закрытие соединения не открывая его перед этим. Нарушается логика протокола tcp, но используется для обхода firewall, которые обычно ждут syn-пакетов.  
-`- Xmas`  
-nmap отправляет пакет, в котором одновременно включены флаги FIN, срочный URG и PSH. Называется новогодняя ёлка из-за чередования единиц и нулей в поле флагов.  
-`- UDP-сканирование:`  
-работает на базе udp, у него вообще нет флагов и сессий. nmap просто отправляет пустой udp-пакет на указанный порт.
+`Добавил через виртуалку новый диск размером 100 Мб:`
 
-![2](https://github.com/Mr-Alex01/syssec1/blob/main/img/2.jpg)
+![4](https://github.com/Mr-Alex01/syssec2/blob/main/img/4.jpg)
 
-`2. Как отвечает сервер?`
+`Зашифровал раздел /dev/sdb1:`
 
-`В зависимости от режима порта (открыт/закрыт) сервер ответит по-разному:`
+![5](https://github.com/Mr-Alex01/syssec2/blob/main/img/5.jpg)
 
-SYN открыт: сервер отвечает пакетом SYN, ACK. nmap в ответ сразу шлет RST, чтобы прервать связь.  
-SYN закрыт: сервер сразу отвечает пакетом RST, ACK.
+`Проверил и увидел, что раздел стал LUKS‑контейнером:`
 
-FIN открыт: сервер игнорирует пакет ничего не присылая в ответ  
-FIN закрыт: сервер отвечает пакетом RST, ACK.
+![6](https://github.com/Mr-Alex01/syssec2/blob/main/img/6.jpg)
 
-Xmas открыт: сервер игнорирует пакет  
-Xmas закрыт: сервер отвечает пакетом RST, ACK.
+`Открыл этот контейне для дальнейшего использования.`  
+`Появился my_luks_vol - разблокированный зашифрованный том:`
 
-UDP открыт: сервер либо молчит, либо присылает специфичный для UDP ответ  
-UDP закрыт: сервер возвращает ICMP-ошибку: Destination unreachable (Port unreachable).
+![7](https://github.com/Mr-Alex01/syssec2/blob/main/img/7.jpg)
+
+`Дальше создал на нём файловую систему:`
+
+![8](https://github.com/Mr-Alex01/syssec2/blob/main/img/8.jpg)
+
+`И примонтировал, получив зашифрованное хранилище на 100 Мб:`
+
+![9](https://github.com/Mr-Alex01/syssec2/blob/main/img/9.jpg)
+
+`После всего размонтировал и закрыл LUKS, том my_luks_vol пропал:`
+
+![10](https://github.com/Mr-Alex01/syssec2/blob/main/img/10.jpg)
+
+
+
+
+
+
+
+
+
+
